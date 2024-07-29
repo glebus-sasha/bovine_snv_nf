@@ -19,5 +19,7 @@ process WHATSHAP {
     script:
     """
     whatshap phase -o ${sid}_phased.vcf --reference=${reference} ${vcf} ${bamFile}
+    # whatshap genotype --reference ${reference} -o ${sid}_genotyped.vcf ${sid}_phased.vcf ${bamFile}
+    # whatshap stats --tsv ${sid}_genotyped.vcf
     """
 }
