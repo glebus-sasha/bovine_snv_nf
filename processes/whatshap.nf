@@ -11,7 +11,7 @@ process WHATSHAP {
     input:
     path reference
     tuple val(sid), path(bai), path(bamFile)
-    path val(sid), path(vcf)
+    tuple val(sid), path(vcf)
 
     output:
     tuple val("${sid}"), path("${sid}_phased.vcf"),      emit: phased_vcf
@@ -19,7 +19,5 @@ process WHATSHAP {
     script:
     """
     whatshap phase -o ${sid}_phased.vcf --reference=${reference} ${vcf} ${bamFile}
-    # whatshap genotype --reference ${reference} -o ${sid}_genotyped.vcf ${sid}_phased.vcf ${bamFile}
-    # whatshap stats --tsv ${sid}_genotyped.vcf
     """
 }

@@ -13,7 +13,7 @@ include { VARCALL_MPILEUP }              from './processes/varcall_mpileup.nf'
 // Logging pipeline information
 log.info """\
 \033[0;36m  ==========================================  \033[0m
-\033[0;34m            G B S   P I P E L I N E           \033[0m
+\033[0;34m         B O V I N E   S N V   N F            \033[0m
 \033[0;36m  ==========================================  \033[0m
 
     reference:  ${params.reference}
