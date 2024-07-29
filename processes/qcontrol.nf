@@ -2,7 +2,6 @@
 process QCONTROL{
     container = 'staphb/fastqc:0.12.1'
     tag "${sid}"
-    cpus params.cpus
     publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/QCONTROL", pattern: '*.html'
 //	debug true
 //    errorStrategy 'ignore'

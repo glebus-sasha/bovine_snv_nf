@@ -3,7 +3,6 @@ process REPORT {
     container = 'staphb/multiqc:latest'
     tag "$flagstat"
     publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/REPORT"
-    cpus params.cpus
 //	  debug true
 //    errorStrategy 'ignore'
 	
@@ -12,12 +11,13 @@ process REPORT {
     path fastqc
     path flagstat
     path bcfstats
+    path vep
 
     output:
     path '*.html', emit: html
 
     script:
     """
-    multiqc $fastqc $fastp $flagstat $bcfstats
+    multiqc $fastqc $fastp $flagstat $bcfstats $vep
     """
 }
