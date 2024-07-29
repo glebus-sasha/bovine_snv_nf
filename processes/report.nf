@@ -10,7 +10,6 @@ process REPORT {
     path fastp
     path fastqc
     path flagstat
-    path bcfstats
     path vep
 
     output:
@@ -18,6 +17,6 @@ process REPORT {
 
     script:
     """
-    multiqc $fastqc $fastp $flagstat $bcfstats $vep
+    multiqc $fastqc $fastp $flagstat $vep
     """
 }
