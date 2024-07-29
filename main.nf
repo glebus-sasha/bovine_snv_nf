@@ -80,8 +80,8 @@ workflow {
     ALIGN(input_fastqs, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
-//    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
-    VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
+    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
+//    VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
     WHATSHAP(reference, BAMINDEX.out.bai, VARCALL_MPILEUP.out.vcf)
     REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect())
 

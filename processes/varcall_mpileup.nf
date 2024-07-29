@@ -17,7 +17,6 @@ process VARCALL_MPILEUP {
 
     script:
     """    
-    bcftools mpileup -R ${regions} -f $reference $bamFile -Ou >${sid}.vcf
-    
+    bcftools mpileup -R ${regions} -f $reference $bamFile -Ou | bcftools call -mv -Ov -o ${sid}.vcf
     """
 }
