@@ -11,10 +11,10 @@ process WHATSHAP {
     input:
     path reference
     tuple val(sid), path(bai), path(bamFile)
-    path vcf
+    path val(sid), path(vcf)
 
     output:
-    tuple val(sid), path("${sid}_phased.vcf"),      emit: phased_vcf
+    tuple val("${sid}"), path("${sid}_phased.vcf"),      emit: phased_vcf
     
     script:
     """

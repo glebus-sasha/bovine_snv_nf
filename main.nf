@@ -8,6 +8,7 @@ include { BAMINDEX }            from './processes/bamindex.nf'
 include { VARCALL }             from './processes/varcall.nf'
 include { WHATSHAP }            from './processes/whatshap.nf'
 include { REPORT }              from './processes/report.nf'
+include { VARCALL_MPILEUP }              from './processes/varcall_mpileup.nf'
 
 // Logging pipeline information
 log.info """\
@@ -79,8 +80,9 @@ workflow {
     ALIGN(input_fastqs, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
-    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
-    WHATSHAP(reference, BAMINDEX.out.bai, VARCALL.out.vcf)
+//    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
+    VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
+    WHATSHAP(reference, BAMINDEX.out.bai, VARCALL_MPILEUP.out.vcf)
     REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect())
 
     // Make the pipeline reports directory if it needs
