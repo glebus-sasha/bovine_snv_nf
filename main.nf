@@ -78,11 +78,10 @@ workflow {
     TRIM(input_fastqs)
     ALIGN(input_fastqs, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
-    QUALIMAP(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
     VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
     ANNOTATE(VARCALL.out.vcf, vep_cache, reference)
-    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), QUALIMAP.out.collect(), ANNOTATE.out.html.collect())
+    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), ANNOTATE.out.html.collect())
 
     // Make the pipeline reports directory if it needs
     if ( params.reports ) {
