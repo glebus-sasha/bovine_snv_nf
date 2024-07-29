@@ -6,6 +6,7 @@ include { ALIGN }               from './processes/align.nf'
 include { FLAGSTAT }            from './processes/flagstat.nf'
 include { BAMINDEX }            from './processes/bamindex.nf'
 include { VARCALL }             from './processes/varcall.nf'
+include { WHATSHAP }            from './processes/whatshap.nf'
 include { ANNOTATE }            from './processes/annotate.nf'
 include { REPORT }              from './processes/report.nf'
 
@@ -80,7 +81,8 @@ workflow {
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
     VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
-    ANNOTATE(VARCALL.out.vcf, vep_cache, reference)
+    WHATSHAP(reference, BAMINDEX.out.bai, VARCALL.out.vcf)
+    ANNOTATE(WHATSHAP.out.phased_vcf, vep_cache, reference)
     REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), ANNOTATE.out.html.collect())
 
     // Make the pipeline reports directory if it needs
