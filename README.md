@@ -2,4 +2,4 @@
 Call GBS using VEP (on cows)
 
 [Презентация
-](https://www.canva.com/design/DAGKRqO8hTM/6QmtxECQs6llb_Cz3svI7Q/edit)
+](https://docs.google.com/presentation/d/16Sr23VtGBRMrwMSkSa1Y6vbML8opXBou-_UJek9XDh8/edit?usp=sharing)
