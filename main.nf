@@ -77,7 +77,7 @@ bed_file = params.regions ? Channel.fromPath("${params.regions}").collect() : Ch
 workflow { 
     QCONTROL(input_fastqs)
     TRIM(input_fastqs)
-    ALIGN(input_fastqs, reference, bwaidx, bed_file)
+    ALIGN(TRIM.out.trimmed_reads, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
     VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
