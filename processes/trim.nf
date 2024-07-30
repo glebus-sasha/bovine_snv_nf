@@ -20,12 +20,14 @@ process TRIM{
     """
     fastp -q 1 -l 20 \
     --trim_poly_g \
+    -p \
+    --detect_adapter_for_pe \
     --thread ${task.cpus} \
     --in1 ${reads[0]} \
     --in2 ${reads[1]}\
     --out1 $fq_1_trimmed \
     --out2 $fq_2_trimmed \
     --html ${sid}.fastp_stats.html \
-    --json ${sid}.fastp_stats.json
+    --json ${sid}.fastp_stats.json 
     """
 }
