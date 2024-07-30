@@ -18,10 +18,7 @@ process TRIM{
     fq_1_trimmed = sid + '_R1.fastq.gz'
     fq_2_trimmed = sid + '_R2.fastq.gz'
     """
-    fastp -q 1 -l 1 \
-    --trim_poly_g \
-    -p \
-    --adapter_sequence "GCAG" \
+    fastp \
     --thread ${task.cpus} \
     --in1 ${reads[0]} \
     --in2 ${reads[1]}\
