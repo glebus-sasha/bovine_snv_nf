@@ -15,13 +15,13 @@ process TRIM{
     path '*.json', emit: json, optional: true
 
     script:
-    fq_1_trimmed = sid + '_R1_P.fastq.gz'
-    fq_2_trimmed = sid + '_R2_P.fastq.gz'
+    fq_1_trimmed = sid + '_R1.fastq.gz'
+    fq_2_trimmed = sid + '_R2.fastq.gz'
     """
     fastp -q 1 -l 20 \
     --trim_poly_g \
     -p \
-    --detect_adapter_for_pe \
+    --adapter_sequence "GCAG" \
     --thread ${task.cpus} \
     --in1 ${reads[0]} \
     --in2 ${reads[1]}\
