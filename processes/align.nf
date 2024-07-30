@@ -8,7 +8,7 @@ process ALIGN {
 //    errorStrategy 'ignore'
 
     input:
-    tuple val(sid), path(reads)
+    tuple val(sid), path(fq_1_trimmed), path(fq_2_trimmed)
     path reference
     path idx
     path bedfile
@@ -20,7 +20,7 @@ process ALIGN {
     def bed_option = bedfile.getBaseName() == 'dummy' ? "" : "-L ${bedfile}"    // If the base name of bedfile is 'dummy', set bed_option to an empty string
     """
         bwa mem \
-            -t ${task.cpus} ${reference} ${reads[0]} ${reads[1]} | \
+            -t ${task.cpus} ${reference} ${fq_1_trimmed} ${fq_2_trimmed} | \
         samtools view -bh ${bed_option} | \
         samtools sort -o ${sid}.sorted.bam
 
