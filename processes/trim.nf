@@ -18,7 +18,7 @@ process TRIM{
     fq_1_trimmed = sid + '_R1.fastq.gz'
     fq_2_trimmed = sid + '_R2.fastq.gz'
     """
-    fastp -q 1 -l 10 \
+    fastp -q 1 -l 1 \
     --trim_poly_g \
     -p \
     --adapter_sequence "GCAG" \
