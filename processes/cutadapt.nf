@@ -5,7 +5,7 @@ process CUTADAPT {
     publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/CUTADAPT"
 
     //debug true
-    //errorStrategy 'ignore'
+    errorStrategy 'ignore'
 	
     input:
     tuple val(sid), path(fq_1_trimmed), path(fq_2_trimmed)
