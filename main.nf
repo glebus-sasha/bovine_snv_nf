@@ -2,6 +2,7 @@
 // Include processes
 include { QCONTROL }            from './processes/qcontrol.nf'
 include { TRIM }                from './processes/trim.nf'
+include { CUTADAPT }            from './processes/cutadapt.nf'
 include { ALIGN }               from './processes/align.nf'
 include { FLAGSTAT }            from './processes/flagstat.nf'
 include { BAMINDEX }            from './processes/bamindex.nf'
@@ -77,7 +78,8 @@ bed_file = params.regions ? Channel.fromPath("${params.regions}").collect() : Ch
 workflow { 
     QCONTROL(input_fastqs)
     TRIM(input_fastqs)
-    ALIGN(TRIM.out.trimmed_reads, reference, bwaidx, bed_file)
+    CUTADAPT(TRIM.out.trimmed_reads, "GCAG")
+    ALIGN(CUTADAPT.out.cutadapted_reads, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
     VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
