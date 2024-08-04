@@ -10,6 +10,7 @@ process WHATSHAP {
 	
     input:
     path reference
+    path faidx
     tuple val(sid), path(bai), path(bamFile)
     tuple val(sid), path(vcf)
 
