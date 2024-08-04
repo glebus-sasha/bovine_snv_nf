@@ -1,7 +1,7 @@
 // Define the `WHATSHAP` process that performs variant calling
 process WHATSHAP {
     container = 'hangsuunc/whatshap:v1'
-    tag "$reference $bamFile $bedfile"
+    tag "$sid"
     publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/WHATSHAP"
 
 //    cache "lenient" 
