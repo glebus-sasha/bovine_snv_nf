@@ -82,8 +82,8 @@ workflow {
     ALIGN(CUTADAPT.out.cutadapted_reads, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
-    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
-//    VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
+//    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
+    VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
     WHATSHAP(reference, faidx, BAMINDEX.out.bai, VARCALL_MPILEUP.out.vcf)
     REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), WHATSHAP.out.stats_tsv.collect())
 
