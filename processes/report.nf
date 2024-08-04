@@ -10,12 +10,13 @@ process REPORT {
     path fastp
     path fastqc
     path flagstat
+    path whatshap
 
     output:
     path '*.html', emit: html
 
     script:
     """
-    multiqc $fastqc $fastp $flagstat
+    multiqc $fastqc $fastp $flagstat $whatshap
     """
 }
