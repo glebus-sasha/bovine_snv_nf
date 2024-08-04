@@ -2,7 +2,7 @@
 process WHATSHAP {
     container = 'hangsuunc/whatshap:v1'
     tag "$reference $bamFile $bedfile"
-    publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/VARCALL"
+    publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/WHATSHAP"
 
 //    cache "lenient" 
 //    debug true
@@ -20,5 +20,6 @@ process WHATSHAP {
     script:
     """
     whatshap phase -o ${sid}_phased.vcf --reference=${reference} ${vcf} ${bamFile}
+    whatshap stats --tsv ${sid}_phased.vcf
     """
 }
