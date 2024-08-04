@@ -4,7 +4,7 @@ process CUTADAPT {
     tag "$sid"
     publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/CUTADAPT"
 
-    debug true
+    //debug true
     //errorStrategy 'ignore'
 	
     input:
