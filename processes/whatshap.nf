@@ -16,6 +16,7 @@ process WHATSHAP {
 
     output:
     tuple val("${sid}"), path("${sid}_phased.vcf"),      emit: phased_vcf
+    tuple val("${sid}"), path("${sid}_phased.tsv"),      emit: stats_tsv
     
     script:
     """

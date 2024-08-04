@@ -85,7 +85,7 @@ workflow {
 //    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
     VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
     WHATSHAP(reference, faidx, BAMINDEX.out.bai, VARCALL_MPILEUP.out.vcf)
-    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect())
+    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), WHATSHAP.out.stats_tsv.collect())
 
     // Make the pipeline reports directory if it needs
     if ( params.reports ) {
