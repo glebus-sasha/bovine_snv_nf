@@ -20,6 +20,6 @@ process WHATSHAP {
     script:
     """
     whatshap phase -o ${sid}_phased.vcf --reference=${reference} ${vcf} ${bamFile}
-    whatshap stats --tsv ${sid}_phased.vcf
+    whatshap stats --tsv ${sid}_phased.tsv ${sid}_phased.vcf
     """
 }
