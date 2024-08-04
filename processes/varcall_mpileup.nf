@@ -17,6 +17,6 @@ process VARCALL_MPILEUP {
 
     script:
     """    
-    bcftools mpileup -R ${regions} -f $reference $bamFile -Ou | bcftools call -mv -Ov -o ${sid}.vcf --threads ${task.cpus}
+    bcftools mpileup -R ${regions} -f $reference $bamFile -Ou | bcftools call -mA -Ov -o ${sid}.vcf --threads ${task.cpus}
     """
 }
