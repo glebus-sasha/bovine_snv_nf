@@ -1,6 +1,6 @@
 // Define the `CUTADAPT` process that performs variant calling
 process CUTADAPT {
-    container = 'biocontainers/cutadapt:v1.18-1-deb-py3_cv1'
+    container = 'zavolab/cutadapt:1.16-slim'
     tag "$sid"
     publishDir "${params.outdir}/${workflow.start.format('yyyy-MM-dd_HH-mm-ss')}_${workflow.runName}/CUTADAPT"
 
