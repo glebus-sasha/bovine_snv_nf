@@ -1,0 +1,67 @@
+---
+title: "Carpet"
+format: html
+editor: visual
+---
+
+## Carpet
+
+-   За основу взят устаревший референс Bos_taurus_UMD_3.1.1 (GCF_000003055.6), потому что под его координаты сделана интерпретация, а так же панель TruSeq Bovine Parentage
+
+-   Создадим файл [SNV_53_interpretation](https://docs.google.com/spreadsheets/d/1uosoIpSLP_Qy-OV0t4FkPe3jNXiAXEa85Hp6OyV5NK8/edit?gid=0#gid=0)на основе [слитых данных](https://apknet.ru/analiz-geneticheskix-xarakteristik-v/); SNV, содержащиеся в нем частично (или полностью) содержатся в [TruSeq Bovine Parentage](https://support.illumina.com/downloads/truseq-bovine-parentage-manifest.html), который сделан на основе [ICAR_554](https://www.icar.org/index.php/certifications/dna-certifications/certification-and-accreditation-of-dna-genetic-laboratories/two-new-dna-based-services/genoex-snp-exchange/icar-554-snp-list-for-parentage-discovery/)
+
+-   Так как слитые данные не содержат координат (но содержат id), создадим bed файл с регионами (точечными SNV), на основе ICAR_554.
+
+-   То есть ковёр пока что делаем на основе ICAR_554, интерпретируем по SNV_53_interpretation
+
+-   SNV_53_interpretation планируется дополнять
+
+## Running Code
+
+```{r}
+library(readxl)
+library(httr)
+library(tidyverse)
+library(googlesheets4)
+```
+
+Читаем [SNV_53_interpretation ](https://docs.google.com/spreadsheets/d/1uosoIpSLP_Qy-OV0t4FkPe3jNXiAXEa85Hp6OyV5NK8/) и [ICAR_554](https://www.icar.org/wp-content/uploads/2020/09/ICAR-554-SNP-List-for-Parentage-Discovery.xlsx)
+
+```{r}
+# URL Google Sheets
+sheet_url <- "https://docs.google.com/spreadsheets/d/1uosoIpSLP_Qy-OV0t4FkPe3jNXiAXEa85Hp6OyV5NK8/"
+
+# SNV_53_interpretation данных из Google Sheets
+SNV_53_interpretation <- read_sheet(sheet_url)
+
+# URL Excel файла
+url <- "https://www.icar.org/wp-content/uploads/2020/09/ICAR-554-SNP-List-for-Parentage-Discovery.xlsx"
+
+# Локальный путь для сохранения файла
+local_path <- tempfile(fileext = ".xlsx")
+
+# Загрузка файла
+GET(url, write_disk(local_path, overwrite = TRUE))
+
+# Чтение Excel файла
+ICAR_554 <- read_excel(local_path)
+```
+
+```{r}
+SNV_53_interpretation
+ICAR_554
+```
+
+Преобразуем в удобный вид и прочитаем [TruSeq Bovine Parentage](https://support.illumina.com/downloads/truseq-bovine-parentage-manifest.html)
+
+```{r}
+# Локальный путь для сохранения файла
+local_path <- "../docs/truseq-bovine-parentage-manifest-file.xlsx"
+truseq_bovine_probes <- read_excel(local_path, sheet = "Probes")
+truseq_bovine_targets <- read_excel(local_path, sheet = "Targets")
+```
+
+```{r}
+truseq_bovine_probes
+truseq_bovine_targets
+```
