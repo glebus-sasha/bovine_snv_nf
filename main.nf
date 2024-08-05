@@ -9,7 +9,7 @@ include { BAMINDEX }            from './processes/bamindex.nf'
 include { VARCALL }             from './processes/varcall.nf'
 include { WHATSHAP }            from './processes/whatshap.nf'
 include { REPORT }              from './processes/report.nf'
-include { VARCALL_MPILEUP }              from './processes/varcall_mpileup.nf'
+include { VARCALL_MPILEUP }     from './processes/varcall_mpileup.nf'
 
 // Logging pipeline information
 log.info """\
