@@ -23,9 +23,14 @@ library(readxl)
 library(httr)
 library(tidyverse)
 library(googlesheets4)
+library(purrr)
+library(fuzzyjoin)
+library(pheatmap)
+library(kableExtra)
+library(plotly)
 ```
 
-Читаем [SNV_53_interpretation ](https://docs.google.com/spreadsheets/d/1uosoIpSLP_Qy-OV0t4FkPe3jNXiAXEa85Hp6OyV5NK8/) и [ICAR_554](https://www.icar.org/wp-content/uploads/2020/09/ICAR-554-SNP-List-for-Parentage-Discovery.xlsx)
+Читаем [SNV_53_interpretation](https://docs.google.com/spreadsheets/d/1uosoIpSLP_Qy-OV0t4FkPe3jNXiAXEa85Hp6OyV5NK8/) и [ICAR_554](https://www.icar.org/wp-content/uploads/2020/09/ICAR-554-SNP-List-for-Parentage-Discovery.xlsx)
 
 ```{r}
 # URL Google Sheets
@@ -49,7 +54,7 @@ ICAR_554 <- read_excel(local_path)
 
 ```{r}
 SNV_53_interpretation
-ICAR_554
+ICAR_554 
 ```
 
 Преобразуем в удобный вид и прочитаем [TruSeq Bovine Parentage](https://support.illumina.com/downloads/truseq-bovine-parentage-manifest.html)
@@ -64,4 +69,142 @@ truseq_bovine_targets <- read_excel(local_path, sheet = "Targets")
 ```{r}
 truseq_bovine_probes
 truseq_bovine_targets
+```
+
+Прочитаем файлы на выходе из пайплайна (после WHATSHAP) и объединим их в единый датафрейм.
+
+Объеденим ICAR_554 и combined_vcf_data по хромосоме и позиции
+
+Сдвиг позиций на -1: В биоинформатике существуют две основные схемы нумерации позиций на хромосоме: 1. 1-based (однобазовая): Нумерация позиций начинается с 1. Пример: первая позиция на хромосоме имеет индекс 1. 2. 0-based (нулебазовая): Нумерация позиций начинается с 0. Пример: первая позиция на хромосоме имеет индекс 0. Формат VCF (Variant Call Format), как правило, использует 1-based нумерацию, в то время как данные после выравнивания и вариантного коллинга могут использовать 0-based нумерацию. В данном случае, если ваши данные в combined_vcf_data используют 0-based нумерацию, вам нужно вычесть 1 из позиций (POS) для приведения их к 1-based нумерации. Мы выполняем сдвиг позиций в столбце Position на -1 для combined_vcf_data, чтобы позиции в обоих датафреймах соответствовали друг другу для объединения.
+
+```{r}
+# Путь к папке с файлами
+folder_path <- "../docs/WHATSHAP"
+
+# Получение списка всех .vcf файлов в папке
+vcf_files <- list.files(path = folder_path, pattern = "\\.vcf$", full.names = TRUE)
+
+# Функция для чтения и обработки каждого .vcf файла
+read_vcf_file <- function(file_path) {
+  # Чтение файла
+  vcf_data <- read_tsv(file_path, comment = "##", col_names = TRUE)
+  
+  # Извлечение имени коровы из имени файла
+  samples_ID <- tools::file_path_sans_ext(basename(file_path))
+  
+  # Добавление столбца с именем коровы
+  vcf_data <- vcf_data %>%
+    mutate(samples_ID = samples_ID)
+  
+  return(vcf_data)
+}
+
+# Чтение и объединение всех .vcf файлов в один датафрейм
+combined_vcf_data <- vcf_files %>%
+  map_df(read_vcf_file) %>%
+  select(`#CHROM`, POS, REF, ALT, QUAL, FILTER, INFO, samples_ID)
+
+# Исходный словарь
+chromosome_mapping <- list(
+  '1' = 'AC_000158.1',
+  '2' = 'AC_000159.1',
+  '3' = 'AC_000160.1',
+  '4' = 'AC_000161.1',
+  '5' = 'AC_000162.1',
+  '6' = 'AC_000163.1',
+  '7' = 'AC_000164.1',
+  '8' = 'AC_000165.1',
+  '9' = 'AC_000166.1',
+  '10' = 'AC_000167.1',
+  '11' = 'AC_000168.1',
+  '12' = 'AC_000169.1',
+  '13' = 'AC_000170.1',
+  '14' = 'AC_000171.1',
+  '15' = 'AC_000172.1',
+  '16' = 'AC_000173.1',
+  '17' = 'AC_000174.1',
+  '18' = 'AC_000175.1',
+  '19' = 'AC_000176.1',
+  '20' = 'AC_000177.1',
+  '21' = 'AC_000178.1',
+  '22' = 'AC_000179.1',
+  '23' = 'AC_000180.1',
+  '24' = 'AC_000181.1',
+  '25' = 'AC_000182.1',
+  '26' = 'AC_000183.1',
+  '27' = 'AC_000184.1',
+  '28' = 'AC_000185.1',
+  '29' = 'AC_000186.1',
+  'X' = 'AC_000187.1'
+)
+
+# Создание обратного словаря
+reverse_chromosome_mapping <- setNames(names(chromosome_mapping), unlist(chromosome_mapping))
+
+# Преобразование столбца с хромосомами
+combined_vcf_data <- combined_vcf_data %>%
+  mutate(`#CHROM` = recode(`#CHROM`, !!!reverse_chromosome_mapping))
+
+# Преобразование столбцов Chromosome и Position в ICAR_554
+ICAR_554 <- ICAR_554 %>%
+  mutate(Chromosome = as.character(Chromosome),
+         Position = as.integer(Position))
+
+# Преобразование столбцов Chromosome и Position в combined_vcf_data
+combined_vcf_data <- combined_vcf_data %>%
+  rename(Chromosome = `#CHROM`, Position = POS) %>%
+  mutate(Chromosome = as.character(Chromosome),
+         Position = as.integer(Position) - 1)  # Сдвиг позиций на 1
+
+# Выполнение внутреннего объединения
+merged_data <- full_join(ICAR_554, combined_vcf_data, by = c("Chromosome", "Position"))
+
+# Просмотр первых строк объединенного датафрейма
+merged_data %>% colnames
+```
+
+# Построение "ковра"
+
+Преобразуем объединенный датафрейм `merged_data` в формат, удобный для построения тепловой карты. Создадим таблицу, где строки будут представлять образцы (`samples_ID`), а столбцы будут представлять порядковые номера SNV.
+
+```{r}
+# 1. Преобразование данных
+# Добавление порядкового номера SNV
+merged_data <- merged_data %>%
+  mutate(snv_id = row_number())  # Порядковый номер SNV
+
+# Преобразование данных в широкий формат, где строки - это SNV, а столбцы - образцы
+wide_data <- merged_data %>%
+  select(snv_id, samples_ID, ALT) %>%
+  pivot_wider(names_from = samples_ID, values_from = ALT) %>%
+  # Преобразование данных в длинный формат для визуализации
+  pivot_longer(cols = -snv_id, names_to = "samples_ID", values_to = "ALT")
+
+# Определение цветов для ALT
+wide_data <- wide_data %>%
+  mutate(color = case_when(
+    is.na(ALT) ~ "black",
+    ALT == "." ~ "green",
+    TRUE ~ "red"
+  ))
+
+# Определение порядкового номера для оси Y
+wide_data <- wide_data %>%
+  group_by(snv_id) %>%
+  mutate(y_order = row_number())
+
+# Создание графика
+p <- ggplot(wide_data, aes(x = snv_id, y = y_order, fill = color)) +
+  geom_tile() +
+  scale_fill_identity() +
+  scale_x_continuous(breaks = unique(wide_data$snv_id), labels = unique(wide_data$snv_id)) +
+  labs(x = "SNV", y = "Sample", fill = "ALT Status") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 12),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8))
+p <- ggplotly(p)
+p
 ```

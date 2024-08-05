@@ -4,6 +4,8 @@ data
 work
 results
 test_data
+*.RData
+*.Rhistory
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
