@@ -51,12 +51,11 @@ vep_cache = params.vepcache ? Channel.fromPath("${params.vepcache}").collect(): 
 bed_file = params.regions ? Channel.fromPath("${params.regions}").collect() : Channel.fromPath("assets/dummy.bed").collect()
 
 // Define the workflow
-workflow { 
+workflow one{ 
     QCONTROL(input_fastqs)
     TRIM(input_fastqs)
-//    CUTADAPT(TRIM.out.trimmed_reads, "GCAG")
-//    ALIGN(CUTADAPT.out.cutadapted_reads, reference, bwaidx, bed_file)
-    ALIGN(TRIM.out.trimmed_reads, reference, bwaidx, bed_file)
+    CUTADAPT(TRIM.out.trimmed_reads, "GCAG")
+    ALIGN(CUTADAPT.out.cutadapted_reads, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
 //    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
@@ -71,6 +70,31 @@ workflow {
     }
 }
 
+workflow two { 
+    QCONTROL(input_fastqs)
+    TRIM(input_fastqs)
+    ALIGN(TRIM.out.trimmed_reads, reference, bwaidx, bed_file)
+    FLAGSTAT(ALIGN.out.bam)
+    BAMINDEX(ALIGN.out.bam)
+    VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
+    WHATSHAP(reference, faidx, BAMINDEX.out.bai, VARCALL_MPILEUP.out.vcf)
+    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), WHATSHAP.out.stats_tsv.collect())
+
+    // Make the pipeline reports directory if it needs
+    if ( params.reports ) {
+        def pipeline_report_dir = new File("${params.outdir}/pipeline_info/")
+        pipeline_report_dir.mkdirs()
+    }
+}
+
+workflow three {
+    reference.view()
+}
+
+
+workflow {
+    three()
+}
 
 
 
