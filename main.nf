@@ -23,30 +23,6 @@ log.info """\
     """
     .stripIndent(true)
 
-// Define help
-if ( params.help ) {
-    help = """main.nf: This repository contains a Nextflow pipeline for analyzing 
-            |Next-Generation Sequencing (NGS) data using octopus 
-            |
-            |Required arguments:
-            |   --reference     Location of the reference file.
-            |                   [default: ${params.reference}]
-            |   --reads         Location of the input file file.
-            |                   [default: ${params.reads}]
-            |   --outdir        Location of the output file file.
-            |                   [default: ${params.outdir}]
-            |
-            |Optional arguments:
-            |   -profile        <docker/singularity>
-            |   -prebuild       Use pre-built bwa indexes and pre-downloaded vep cache
-            |   -reports        Generate pipeline reports
-            |
-""".stripMargin()
-    // Print the help with the stripped margin and exit
-    println(help)
-    exit(0)
-}
-
 // Make the results directory if it needs
 def result_dir = new File("${params.outdir}")
 result_dir.mkdirs()
@@ -78,8 +54,9 @@ bed_file = params.regions ? Channel.fromPath("${params.regions}").collect() : Ch
 workflow { 
     QCONTROL(input_fastqs)
     TRIM(input_fastqs)
-    CUTADAPT(TRIM.out.trimmed_reads, "GCAG")
-    ALIGN(CUTADAPT.out.cutadapted_reads, reference, bwaidx, bed_file)
+//    CUTADAPT(TRIM.out.trimmed_reads, "GCAG")
+//    ALIGN(CUTADAPT.out.cutadapted_reads, reference, bwaidx, bed_file)
+    ALIGN(TRIM.out.trimmed_reads, reference, bwaidx, bed_file)
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
 //    VARCALL(reference, BAMINDEX.out.bai, faidx, bed_file)
@@ -92,23 +69,6 @@ workflow {
         def pipeline_report_dir = new File("${params.outdir}/pipeline_info/")
         pipeline_report_dir.mkdirs()
     }
-}
-
-// Log pipeline execution summary on completion
-workflow.onComplete {
-    log.info """\033[0;32m\
-    
-Pipeline execution summary
----------------------------
-Completed at: ${workflow.complete.format('yyyy-MM-dd_HH-mm-ss')}
-Duration    : ${workflow.duration}
-Success     : ${workflow.success}
-workDir     : ${workflow.workDir}
-exit status : ${workflow.exitStatus}
-\033[0m"""
-    .stripIndent()
-        
-    log.info ( workflow.success ? "\nDone" : "\nOops" )
 }
 
 
