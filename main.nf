@@ -89,6 +89,11 @@ workflow two {
 
 workflow three {
     reference.view()
+    input_fastqs.view()
+    bwaidx.view()
+    vep_cache.view()
+    bed_file.view()
+
 }
 
 
