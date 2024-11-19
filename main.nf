@@ -94,7 +94,7 @@ workflow three {
 
 
 workflow {
-    three()
+    one()
 }
 
 
