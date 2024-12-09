@@ -79,7 +79,6 @@ workflow two {
 
 workflow three {
     input_fastqs.view()
-
 }
 
 

@@ -12,10 +12,10 @@ process BCFSTATS {
     tuple val(sid), path(vcf)
 
     output:
-    path "${sid}.bcsfstats",      emit: bcsfstats
+    path "${sid}.bcfstats",      emit: bcfstats
     
     script:
     """
-    bcftools stats $vcf > "${sid}.bcsfstats"
+    bcftools stats $vcf > "${sid}.bcfstats"
     """
 }
