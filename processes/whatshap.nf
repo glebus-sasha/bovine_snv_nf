@@ -1,4 +1,4 @@
-// Define the `WHATSHAP` process that performs variant calling
+// Define the `WHATSHAP` process that performs phasing
 process WHATSHAP {
     container = 'hangsuunc/whatshap:v1'
     tag "$sid"

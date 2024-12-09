@@ -1,15 +1,16 @@
 #!/usr/bin/env nextflow
 // Include processes
-include { QCONTROL }            from './processes/qcontrol.nf'
-include { TRIM }                from './processes/trim.nf'
-include { CUTADAPT }            from './processes/cutadapt.nf'
-include { ALIGN }               from './processes/align.nf'
-include { FLAGSTAT }            from './processes/flagstat.nf'
-include { BAMINDEX }            from './processes/bamindex.nf'
-include { VARCALL }             from './processes/varcall.nf'
-include { WHATSHAP }            from './processes/whatshap.nf'
-include { REPORT }              from './processes/report.nf'
-include { VARCALL_MPILEUP }     from './processes/varcall_mpileup.nf'
+include { QCONTROL              } from './processes/qcontrol.nf'
+include { TRIM                  } from './processes/trim.nf'
+include { CUTADAPT              } from './processes/cutadapt.nf'
+include { ALIGN                 } from './processes/align.nf'
+include { FLAGSTAT              } from './processes/flagstat.nf'
+include { BAMINDEX              } from './processes/bamindex.nf'
+include { VARCALL               } from './processes/varcall.nf'
+include { BCFSTATS              } from './processes/bcfstats.nf'
+include { WHATSHAP              } from './processes/whatshap.nf'
+include { REPORT                } from './processes/report.nf'
+include { VARCALL_MPILEUP       } from './processes/varcall_mpileup.nf'
 
 // Logging pipeline information
 log.info """\
@@ -46,7 +47,7 @@ faidx = params.bwaidx ? Channel.fromPath("${params.faidx}/*.fai", checkIfExists:
 bed_file = params.regions ? Channel.fromPath("${params.regions}").collect() : Channel.fromPath("assets/dummy.bed").collect()
 
 // Define the workflow
-workflow one{ 
+workflow one { 
     QCONTROL(input_fastqs)
     TRIM(input_fastqs)
     CUTADAPT(TRIM.out.trimmed_reads, "GCAG")
@@ -72,14 +73,8 @@ workflow two {
     FLAGSTAT(ALIGN.out.bam)
     BAMINDEX(ALIGN.out.bam)
     VARCALL_MPILEUP(reference, BAMINDEX.out.bai, faidx, bed_file)
-    WHATSHAP(reference, faidx, BAMINDEX.out.bai, VARCALL_MPILEUP.out.vcf)
-    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), WHATSHAP.out.stats_tsv.collect())
-
-    // Make the pipeline reports directory if it needs
-    if ( params.reports ) {
-        def pipeline_report_dir = new File("${params.outdir}/pipeline_info/")
-        pipeline_report_dir.mkdirs()
-    }
+    BCFSTATS(VARCALL_MPILEUP.out.vcf)
+    REPORT(TRIM.out.json.collect(), QCONTROL.out.zip.collect(), FLAGSTAT.out.flagstat.collect(), BCFSTATS.out.bcfstats.collect())
 }
 
 workflow three {
